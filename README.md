@@ -6,7 +6,8 @@ AI-powered system for summarizing and simplifying scientific articles to improve
 - PDF text extraction
 - Automatic summarization
 - Language simplification
-- (Next) AI-based summarization and simplification
+- LLM-based simplification with controlled prompts
+- Structured output with key concept explanations
 
 ## Tech Stack
 - Python
