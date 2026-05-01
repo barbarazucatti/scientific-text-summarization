@@ -24,6 +24,15 @@ Guidelines:
 - Avoid vague explanations — be specific about how things work
 - Each concept MUST be on a new line
 - Do NOT merge bullet points
+- Do not introduce any information that is not present in the text
+
+STRICT RULES:
+- Do NOT add any information that is not explicitly present in the text
+- Do NOT infer results, experiments, or clinical outcomes unless clearly stated
+- If information is unclear or incomplete, say so instead of guessing
+- If specific numbers (e.g., number of patients, results) are not present, do NOT create them
+- Only summarize what is directly supported by the text
+
 
 
 Text:
@@ -47,7 +56,31 @@ Return in this format:
     return response.output[0].content[0].text
 
 
-    print(text[:2000])
+def merge_summaries(summaries, client):
+
+    prompt = f"""
+You are merging scientific summaries.
+
+Rules:
+- Remove repetition
+- Keep structure logical
+- Preserve scientific meaning
+- Keep it readable for non-experts
+
+Summaries:
+{chr(10).join(summaries)}
+
+Return a final unified explanation with:
+1. Simple explanation
+2. Key concepts
+"""
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}]
+    )
+
+    return response.choices[0].message.content
 
 
 

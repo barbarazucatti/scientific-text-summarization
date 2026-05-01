@@ -78,3 +78,26 @@ def clean_text(text: str) -> str:
     text = re.sub(r"\b[A-Z][a-z]+\s[A-Z][a-z]+\s\d+(?:\sand\s\d+)?\b", "", text)
 
     return text.strip()
+
+def extract_scientific_sections(text):
+    text = text.replace("\n", " ")
+
+    patterns = {
+        "abstract": r"(abstract)(.*?)(introduction|1\.)",
+        "introduction": r"(introduction)(.*?)(methods|materials and methods|2\.)",
+        "methods": r"(methods|materials and methods)(.*?)(results|3\.)",
+        "results": r"(results)(.*?)(discussion|4\.)",
+        "discussion": r"(discussion)(.*?)(references|conclusion|5\.)",
+        "conclusion": r"(conclusion)(.*?)(references|$)"
+    }
+
+    sections = {}
+
+    for key, pattern in patterns.items():
+        match = re.search(pattern, text, re.IGNORECASE | re.DOTALL)
+        if match:
+            sections[key] = match.group(2).strip()
+        else:
+            sections[key] = ""
+
+    return sections
