@@ -6,6 +6,10 @@ import streamlit as st
 from main import process_article
 
 
+MAX_PDF_SIZE_MB = 10
+MAX_PDF_SIZE_BYTES = MAX_PDF_SIZE_MB * 1024 * 1024
+
+
 st.set_page_config(
     page_title="Insight Cientifico",
     layout="wide",
@@ -169,7 +173,7 @@ st.markdown(
         <h1>Insight Cient&iacute;fico</h1>
         <p>
             Use esta p&aacute;gina para ler um artigo com mais clareza. Ela prepara uma explica&ccedil;&atilde;o
-            em portugu&ecirc;s brasileiro, mantendo as cautelas do estudo e separando o que foi observado
+            em portugu&ecirc;s, mantendo as cautelas do estudo e separando o que foi observado
             do que ainda n&atilde;o d&aacute; para afirmar.
         </p>
     </section>
@@ -199,7 +203,7 @@ st.markdown(
 
 st.markdown('<h2 class="workbench-title">Selecionar artigo</h2>', unsafe_allow_html=True)
 st.write(
-    "Carregue um PDF com texto selecionável. Arquivos scaneados como imagem podem não ser lidos corretamente."
+    f"Carregue um PDF com texto selecionável, de até {MAX_PDF_SIZE_MB} MB. Arquivos scaneados como imagem podem não ser lidos corretamente."
 )
 
 uploaded_file = st.file_uploader(
@@ -211,17 +215,24 @@ uploaded_file = st.file_uploader(
 st.markdown(
     """
     <div class="note">
-        O resultado serve como guia inicial de leitura. Para decisões importantes, confira o artigo original
-        e observe especialmente método, amostra, resultados e limitações.
+        O insight serve como apoio inicial de leitura. Ele não substitui o artigo original:
+        confira método, amostra, resultados e limitações antes de usar a informação em decisões importantes.
     </div>
     """,
     unsafe_allow_html=True,
 )
 
 if uploaded_file is not None:
-    st.write(f"Arquivo selecionado: {uploaded_file.name}")
+    file_size_mb = uploaded_file.size / (1024 * 1024)
+    st.write(f"Arquivo selecionado: {uploaded_file.name} ({file_size_mb:.1f} MB)")
 
-    if st.button("Gerar insight científico", type="primary"):
+    file_is_too_large = uploaded_file.size > MAX_PDF_SIZE_BYTES
+    if file_is_too_large:
+        st.warning(
+            f"Este PDF tem {file_size_mb:.1f} MB. Envie um arquivo de até {MAX_PDF_SIZE_MB} MB para gerar o insight."
+        )
+
+    if st.button("Gerar insight científico", type="primary", disabled=file_is_too_large):
         suffix = Path(uploaded_file.name).suffix or ".pdf"
 
         with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as temp_file:

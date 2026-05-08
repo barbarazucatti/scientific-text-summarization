@@ -216,3 +216,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Local PDFs used for testing
+temp.pdf
+data/*.pdf

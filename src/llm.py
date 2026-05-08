@@ -1,8 +1,28 @@
+import os
+
 from openai import OpenAI
 
-client = OpenAI()
-
 MODEL = "gpt-4o-mini"
+
+
+def _get_api_key():
+    api_key = os.getenv("OPENAI_API_KEY")
+    if api_key:
+        return api_key
+
+    try:
+        import streamlit as st
+        return st.secrets.get("OPENAI_API_KEY")
+    except Exception:
+        return None
+
+
+def _get_client():
+    api_key = _get_api_key()
+    if api_key:
+        return OpenAI(api_key=api_key)
+
+    return OpenAI()
 
 
 def _extract_response_text(response):
@@ -70,7 +90,7 @@ Um unico paragrafo curto, amigavel e claro, como divulgacao cientifica responsav
 - Liste as principais limitacoes, incertezas ou cautelas do artigo.
 """
 
-    response = client.responses.create(
+    response = _get_client().responses.create(
         model=MODEL,
         input=prompt
     )
@@ -78,7 +98,7 @@ Um unico paragrafo curto, amigavel e claro, como divulgacao cientifica responsav
     return _extract_response_text(response)
 
 
-def merge_summaries(summaries, client=client):
+def merge_summaries(summaries):
     if not summaries:
         return "Nao foi possivel gerar a explicacao porque nenhum texto util foi extraido do PDF."
 
@@ -119,7 +139,7 @@ Um texto corrido, amigavel e claro.
 - Limitacoes e cautelas principais.
 """
 
-    response = client.responses.create(
+    response = _get_client().responses.create(
         model=MODEL,
         input=prompt
     )
