@@ -215,7 +215,7 @@ uploaded_file = st.file_uploader(
 st.markdown(
     """
     <div class="note">
-        O insight serve como apoio inicial de leitura. Ele não substitui o artigo original:
+        O Insight serve como apoio inicial de leitura. Ele não substitui o artigo original:
         confira método, amostra, resultados e limitações antes de usar a informação em decisões importantes.
     </div>
     """,
@@ -240,10 +240,10 @@ if uploaded_file is not None:
             temp_path = temp_file.name
 
         try:
-            with st.spinner("Lendo o artigo e organizando a explicacao..."):
+            with st.spinner("Lendo o artigo e organizando a explicação..."):
                 result = process_article(temp_path)
         finally:
             Path(temp_path).unlink(missing_ok=True)
 
-        st.markdown("### Insight cientifico")
+        st.markdown("### Insight Científico")
         st.markdown(result)

@@ -100,10 +100,10 @@ Um unico paragrafo curto, amigavel e claro, como divulgacao cientifica responsav
 
 def merge_summaries(summaries):
     if not summaries:
-        return "Nao foi possivel gerar a explicacao porque nenhum texto util foi extraido do PDF."
+        return "Nao foi possível gerar a explição porque nenhum texto útil foi extraído do PDF."
 
     prompt = f"""
-Voce esta juntando explicacoes parciais de um mesmo artigo cientifico.
+Você está juntando explicações parciais de um mesmo artigo científico.
 
 Sua tarefa e produzir uma explicacao final em portugues brasileiro para pessoas leigas.
 
@@ -121,21 +121,21 @@ Resumos parciais:
 
 Responda exatamente neste formato:
 
-### Explicacao em linguagem simples:
+### Explicação em linguagem simples:
 Um texto corrido, amigavel e claro.
 
-### O que o artigo realmente mostra:
-- Problema estudado:
-- O que os pesquisadores fizeram:
-- O que encontraram:
-- Em quem ou em que foi testado:
-- Por que isso pode importar:
-- O que ainda nao da para afirmar:
+### Principais informações do estudo:
+- Problema investigado:
+- Objetivos dos pesquisadores:
+- O que foi realizado no estudo:
+- Principais descobertas:
+- Possíveis impactos ou aplicações:
+- O que o estudo ainda não permite concluir:
 
 ### Conceitos importantes:
 - Termo: explicacao simples
 
-### Cuidados para nao exagerar:
+### Cuidado:
 - Limitacoes e cautelas principais.
 """
 
