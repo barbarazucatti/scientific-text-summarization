@@ -1,14 +1,16 @@
-# Scientific Text Summarization - Insight Científico
+# Scientific Text Summarization - Insight Cientí­fico
 
 Aplicação em Streamlit que utiliza Large Language Models (LLMs) para transformar artigos científicos complexos em explicações claras, acessíveis e fáceis de entender.
 
 A ferramenta extrai conteúdo de PDFs científicos, identifica seções relevantes do artigo e gera:
+
 - resumos simplificados,
 - explicações em linguagem natural,
 - conceitos-chave,
 - e contextualizações para facilitar a compreensão técnica.
 
 O projeto foi desenvolvido como um protótipo de IA aplicada à democratização do conhecimento científico, explorando técnicas de:
+
 - processamento de PDFs,
 - limpeza e estruturação de texto,
 - chunking inteligente,
@@ -45,5 +47,4 @@ $env:OPENAI_API_KEY="sua-chave-aqui"
 ```
 
 ## Objetivo
-
-Democratizar o acesso ao conhecimento cientifico, explicando pesquisas complexas com clareza, fidelidade e responsabilidade.
+Democratizar o acesso ao conhecimento científico, explicando pesquisas complexas com clareza, fidelidade e responsabilidade.
