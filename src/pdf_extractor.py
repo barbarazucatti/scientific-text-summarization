@@ -1,11 +1,11 @@
 import fitz  # PyMuPDF
 
+
 def extract_text_from_pdf(pdf_path: str) -> str:
-    text = ""
+    pages = []
 
-    doc = fitz.open(pdf_path)
+    with fitz.open(pdf_path) as doc:
+        for page in doc:
+            pages.append(page.get_text("text"))
 
-    for page in doc:
-        text += page.get_text("text")
-
-    return text
+    return "\n\n".join(pages)

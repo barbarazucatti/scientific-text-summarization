@@ -2,85 +2,126 @@ from openai import OpenAI
 
 client = OpenAI()
 
-def simplify_text(text):
-    
-    print(">>> TEXTO REAL RECEBIDO:")
-    print(repr(text))
-    
-    prompt = f"""
-You are an assistant that rewrites scientific content for non-experts while preserving important details.
-
-Your goal is to make the text easier to understand WITHOUT reducing its level of detail.
-
-Guidelines:
-- DO NOT remove or generalize specific techniques, methods, or named concepts (e.g., CRISPR, CAR-T cells)
-- DO NOT shorten the content significantly
-- Preserve cause-effect relationships and mechanisms described in the text
-- If the input is detailed, the output MUST also be detailed
-- Do NOT explain technical terms inside the main text
-- List and explain all important technical terms in the "Key Concepts Explained" section
-- Ensure that every important term from the text is included in the Key Concepts section
-- You may include additional terms ONLY if necessary for understanding
-- Avoid vague explanations — be specific about how things work
-- Each concept MUST be on a new line
-- Do NOT merge bullet points
-- Do not introduce any information that is not present in the text
-
-STRICT RULES:
-- Do NOT add any information that is not explicitly present in the text
-- Do NOT infer results, experiments, or clinical outcomes unless clearly stated
-- If information is unclear or incomplete, say so instead of guessing
-- If specific numbers (e.g., number of patients, results) are not present, do NOT create them
-- Only summarize what is directly supported by the text
+MODEL = "gpt-4o-mini"
 
 
-
-Text:
-{text}
-
-Return in this format:
-
-### Simplified Explanation:
-...
-
-### Key Concepts Explained:
-- Term: explanation
-- Term: explanation
-"""
-
-    response = client.responses.create(
-        model="gpt-4o-mini",
-        input=prompt
-    )
-
+def _extract_response_text(response):
     return response.output[0].content[0].text
 
 
-def merge_summaries(summaries, client):
+def simplify_text(text):
+    print(">>> Texto recebido pelo LLM:")
+    print(repr(text[:1000]))
 
     prompt = f"""
-You are merging scientific summaries.
+Voce e um tradutor cientifico responsavel para portugues brasileiro.
 
-Rules:
-- Remove repetition
-- Keep structure logical
-- Preserve scientific meaning
-- Keep it readable for non-experts
+Sua tarefa e transformar o texto fornecido de um artigo cientifico em um resumo amigavel, curto e acessivel para pessoas leigas.
 
-Summaries:
-{chr(10).join(summaries)}
+O texto pode estar em ingles, portugues ou outro idioma.
+Leia o texto no idioma original, mas responda sempre em portugues brasileiro.
 
-Return a final unified explanation with:
-1. Simple explanation
-2. Key concepts
+REGRAS OBRIGATORIAS:
+- Use somente informacoes presentes no texto fornecido.
+- Se o texto indicar que um trecho foi omitido para reduzir tempo, nao tente preencher essa lacuna.
+- Nao adicione contexto externo.
+- Nao invente aplicacoes, promessas, tratamentos ou conclusoes.
+- Nao transforme hipotese em fato.
+- Nao transforme resultados em animais, celulas ou laboratorio em resultado comprovado em humanos.
+- Nao use palavras como "cura", "revolucionario", "definitivo" ou "comprovado" se o texto nao afirmar isso claramente.
+- Preserve o grau de certeza dos autores.
+- Se o texto disser "pode", "sugere", "foi observado", "em camundongos", "em celulas" ou "estudo preliminar", mantenha essa cautela.
+- Se uma informacao importante nao estiver clara, diga: "O artigo nao informa isso com clareza."
+
+PROCESSO:
+1. Extraia os fatos principais do artigo.
+2. Escolha apenas o que e mais importante para uma pessoa leiga entender a ideia central.
+3. Revise a explicacao final e remova qualquer afirmacao que nao esteja apoiada no texto.
+
+ESTILO DO RESUMO:
+- Escreva primeiro um unico paragrafo curto, com 4 a 6 frases.
+- O tom deve parecer divulgacao cientifica simples, nao relatorio tecnico.
+- Comece com "O artigo..." quando isso soar natural.
+- Foque no problema estudado, na proposta principal, no possivel impacto e na cautela.
+- Nao liste detalhes secundarios no paragrafo principal, como orgaos reguladores, numeros de produtos aprovados, nomes de aprovacao, custos ou processo industrial, a menos que sejam a descoberta central do artigo.
+- Prefira frases como "mostra potencial", "pode ajudar", "ainda precisa de mais estudos" quando o artigo nao trouxer certeza forte.
+
+Texto:
+{text}
+
+Responda exatamente neste formato:
+
+### Explicacao em linguagem simples:
+Um unico paragrafo curto, amigavel e claro, como divulgacao cientifica responsavel.
+
+### O que o artigo realmente mostra:
+- Problema estudado:
+- O que os pesquisadores fizeram:
+- O que encontraram:
+- Em quem ou em que foi testado:
+- Por que isso pode importar:
+- O que ainda nao da para afirmar:
+
+### Conceitos importantes:
+- Termo: explicacao simples
+- Termo: explicacao simples
+
+### Cuidados para nao exagerar:
+- Liste as principais limitacoes, incertezas ou cautelas do artigo.
 """
 
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}]
+    response = client.responses.create(
+        model=MODEL,
+        input=prompt
     )
 
-    return response.choices[0].message.content
+    return _extract_response_text(response)
 
 
+def merge_summaries(summaries, client=client):
+    if not summaries:
+        return "Nao foi possivel gerar a explicacao porque nenhum texto util foi extraido do PDF."
 
+    prompt = f"""
+Voce esta juntando explicacoes parciais de um mesmo artigo cientifico.
+
+Sua tarefa e produzir uma explicacao final em portugues brasileiro para pessoas leigas.
+
+REGRAS OBRIGATORIAS:
+- Use apenas informacoes presentes nos resumos abaixo.
+- Nao adicione informacoes novas.
+- Remova repeticoes.
+- Preserve cautelas, limitacoes e incertezas.
+- Nao aumente o grau de certeza dos resultados.
+- Nao transforme pesquisa preliminar em tratamento disponivel.
+- Se houver conflito entre os resumos, mencione que a informacao nao esta clara.
+
+Resumos parciais:
+{chr(10).join(summaries)}
+
+Responda exatamente neste formato:
+
+### Explicacao em linguagem simples:
+Um texto corrido, amigavel e claro.
+
+### O que o artigo realmente mostra:
+- Problema estudado:
+- O que os pesquisadores fizeram:
+- O que encontraram:
+- Em quem ou em que foi testado:
+- Por que isso pode importar:
+- O que ainda nao da para afirmar:
+
+### Conceitos importantes:
+- Termo: explicacao simples
+
+### Cuidados para nao exagerar:
+- Limitacoes e cautelas principais.
+"""
+
+    response = client.responses.create(
+        model=MODEL,
+        input=prompt
+    )
+
+    return _extract_response_text(response)

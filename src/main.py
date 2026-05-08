@@ -1,36 +1,31 @@
+from llm import simplify_text
+from llm_processor import build_article_digest
 from pdf_extractor import extract_text_from_pdf
-from text_cleaner import clean_text
-from text_cleaner import extract_scientific_sections
-
-from llm_processor import chunk_by_section, simplify_chunks
-from llm import simplify_text, merge_summaries
-
-from openai import OpenAI
-
-client = OpenAI()
+from text_cleaner import clean_text, extract_scientific_sections
 
 
 def process_article(pdf_path):
-
-    print("📄 Extracting text...")
+    print("Extracting text...")
     raw_text = extract_text_from_pdf(pdf_path)
 
-    print("🧹 Cleaning text...")
+    if not raw_text.strip():
+        return "Nao foi possivel extrair texto desse PDF. Verifique se ele nao e apenas imagem/scaneado."
+
+    print("Cleaning text...")
     cleaned_text = clean_text(raw_text)
 
-    print("🔎 Extracting scientific sections...")
+    print("Extracting scientific sections...")
     sections = extract_scientific_sections(cleaned_text)
 
-    print("✂️ Chunking by section...")
-    chunks = chunk_by_section(sections)
+    print("Preparing article digest...")
+    article_digest = build_article_digest(sections, full_text=cleaned_text)
 
-    print(f"Total structured chunks: {len(chunks)}")
+    if not article_digest.strip():
+        return "Nao foi possivel preparar o texto desse PDF para explicacao."
 
-    print("🧠 Simplifying chunks...")
-    simplified_chunks = simplify_chunks(chunks, simplify_text)
-
-    print("🧠 Merging...")
-    final_result = merge_summaries(simplified_chunks, client)
+    print(f"Digest size: {len(article_digest)} characters")
+    print("Generating final explanation...")
+    final_result = simplify_text(article_digest)
 
     print("\n=== RESULTADO FINAL ===\n")
     print(final_result)
@@ -39,7 +34,7 @@ def process_article(pdf_path):
 
 
 if __name__ == "__main__":
-    print("🚀 Script iniciou")
+    print("Script started")
     result = process_article("../data/CRISPR gene editing technology.pdf")
     print("\n=== RESULTADO FINAL ===\n")
     print(result)

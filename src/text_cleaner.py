@@ -1,103 +1,69 @@
 import re
 
+
 def clean_text(text: str) -> str:
     if not text:
         return ""
 
-    # ----------------------------
-    # 1. Corrigir ligaduras
-    # ----------------------------
-    text = (text
-        .replace("ﬁ", "fi")
-        .replace("ﬂ", "fl")
-        .replace("ﬀ", "ff")
-    )
+    replacements = {
+        "\ufb01": "fi",
+        "\ufb02": "fl",
+        "\ufb00": "ff",
+        "\u00a0": " ",
+    }
 
-    # ----------------------------
-    # 2. Remover URLs
-    # ----------------------------
+    for old, new in replacements.items():
+        text = text.replace(old, new)
+
     text = re.sub(r"http\S+|www\.\S+", "", text)
-
-    # ----------------------------
-    # 3. Remover cabeçalhos comuns (mais seguro)
-    # ----------------------------
-    text = re.sub(r"\b(REVIEW ARTICLE|OPEN|IMMUNOTHERAPY)\b", "", text, flags=re.IGNORECASE)
-
-    # ----------------------------
-    # 4. Remover copyright
-    # ----------------------------
-    text = re.sub(r"©.*?\d{4}", "", text)
-
-    # ----------------------------
-    # 5. Remover autores (padrão mais específico)
-    # ----------------------------
-    text = re.sub(r"(?:[A-Z][a-z]+\s[A-Z][a-z]+(?:\d+,?\s*)?)+(?=,|\n)", "", text)
-
-    # ----------------------------
-    # 6. Remover números soltos estranhos
-    # ----------------------------
-    text = re.sub(r"\b\d+(?:,\s*\d+)+\b", "", text)
-
-    # ----------------------------
-    # 7. Corrigir palavras grudadas (MELHORADO)
-    # ----------------------------
-    text = re.sub(r"([a-z])([A-Z])", r"\1 \2", text)
-    text = re.sub(r"([a-zA-Z])(\()", r"\1 \2", text)
-
-    # ----------------------------
-    # 8. Corrigir espaços
-    # ----------------------------
-    text = re.sub(r"\s+", " ", text)
-
-    # ----------------------------
-    # 9. Limpar caracteres estranhos
-    # ----------------------------
-    text = re.sub(r"[^\w\s.,;:()\-/]", "", text)
-    
-    # ----------------------------
-    # 10. Corrigir letras + números colados
-    # ----------------------------
-    text = re.sub(r"([a-zA-Z])(\d)", r"\1 \2", text)
-    text = re.sub(r"(\d)([a-zA-Z])", r"\1 \2", text)
-
-    # ----------------------------
-    # 11. Remover padrões de afiliação (números soltos com vírgula)
-    # ----------------------------
-    text = re.sub(r"(,\s*\d+\s*)+", "", text)
-    
-    # ----------------------------
-    # 12. Remover vírgulas soltas e lixo residual
-    # ----------------------------
-    text = re.sub(r"(,\s*){2,}", ", ", text)   # várias vírgulas → 1
-    text = re.sub(r"\s+,", ",", text)          # espaço antes de vírgula
-    text = re.sub(r",\s*,", ", ", text)        # vírgulas duplicadas
-
-    # ----------------------------
-    # 13. Remover nomes isolados com números (resto de autores)
-    # ----------------------------
-    text = re.sub(r"\b[A-Z][a-z]+\s[A-Z][a-z]+\s\d+(?:\sand\s\d+)?\b", "", text)
+    text = re.sub(r"-\s*\n\s*", "", text)
+    text = re.sub(r"[ \t]+", " ", text)
+    text = re.sub(r"\n{3,}", "\n\n", text)
 
     return text.strip()
 
-def extract_scientific_sections(text):
-    text = text.replace("\n", " ")
 
-    patterns = {
-        "abstract": r"(abstract)(.*?)(introduction|1\.)",
-        "introduction": r"(introduction)(.*?)(methods|materials and methods|2\.)",
-        "methods": r"(methods|materials and methods)(.*?)(results|3\.)",
-        "results": r"(results)(.*?)(discussion|4\.)",
-        "discussion": r"(discussion)(.*?)(references|conclusion|5\.)",
-        "conclusion": r"(conclusion)(.*?)(references|$)"
+def extract_scientific_sections(text):
+    normalized = re.sub(r"\r\n?", "\n", text)
+
+    heading_patterns = {
+        "abstract": r"abstract|summary|resumo",
+        "introduction": r"introduction|introducao",
+        "methods": r"methods|materials and methods|methodology|metodos|materiais e metodos",
+        "results": r"results|resultados",
+        "discussion": r"discussion|discussao",
+        "conclusion": r"conclusion|conclusions|conclusao|consideracoes finais",
+        "references": r"references|referencias|bibliography",
     }
 
-    sections = {}
+    matches = []
+    for section, pattern in heading_patterns.items():
+        regex = rf"(?im)^\s*(?:\d+(?:\.\d+)*\.?\s*)?(?:{pattern})\s*$"
+        for match in re.finditer(regex, normalized):
+            matches.append((match.start(), match.end(), section))
 
-    for key, pattern in patterns.items():
-        match = re.search(pattern, text, re.IGNORECASE | re.DOTALL)
-        if match:
-            sections[key] = match.group(2).strip()
-        else:
-            sections[key] = ""
+    matches.sort(key=lambda item: item[0])
+
+    sections = {
+        "abstract": "",
+        "introduction": "",
+        "methods": "",
+        "results": "",
+        "discussion": "",
+        "conclusion": "",
+    }
+
+    for index, (_, heading_end, section) in enumerate(matches):
+        if section == "references":
+            continue
+
+        next_start = len(normalized)
+        for next_match in matches[index + 1:]:
+            next_start = next_match[0]
+            break
+
+        content = normalized[heading_end:next_start].strip()
+        if content and section in sections:
+            sections[section] = content
 
     return sections
