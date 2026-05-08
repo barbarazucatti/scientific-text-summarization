@@ -71,22 +71,23 @@ Texto:
 
 Responda exatamente neste formato:
 
-### Explicacao em linguagem simples:
+### Resumo do artigo
 Um unico paragrafo curto, amigavel e claro, como divulgacao cientifica responsavel.
 
-### O que o artigo realmente mostra:
-- Problema estudado:
-- O que os pesquisadores fizeram:
-- O que encontraram:
-- Em quem ou em que foi testado:
-- Por que isso pode importar:
-- O que ainda nao da para afirmar:
+### Principais informações do estudo:
+- Problema investigado:
+- Objetivos dos pesquisadores:
+- O que foi realizado no estudo:
+- Principais descobertas:
+- Possíveis impactos ou aplicações:
+- O que o estudo ainda não permite concluir:
 
 ### Conceitos importantes:
 - Termo: explicacao simples
 - Termo: explicacao simples
+- Termo: explicacao simples
 
-### Cuidados para nao exagerar:
+### Cuidado:
 - Liste as principais limitacoes, incertezas ou cautelas do artigo.
 """
 
@@ -121,7 +122,7 @@ Resumos parciais:
 
 Responda exatamente neste formato:
 
-### Explicação em linguagem simples:
+### Resumo do artigo:
 Um texto corrido, amigavel e claro.
 
 ### Principais informações do estudo:
