@@ -7,7 +7,7 @@ from main import process_article
 
 
 st.set_page_config(
-    page_title="Leitura Cientifica Guiada",
+    page_title="Insight Cientifico",
     layout="wide",
 )
 
@@ -17,27 +17,26 @@ st.markdown(
         :root {
             --ink: #272321;
             --muted: #6f6761;
-            --paper: #fffaf1;
-            --line: #e7dccb;
-            --mint: #cfe6cf;
-            --blue: #cbe3e6;
-            --pink: #f5c8cf;
-            --yellow: #f7df93;
-            --coral: #ed765f;
+            --paper: #fffdf7;
+            --line: #c9dff0;
+            --margin: #f0b3aa;
+            --mint: #dcebd8;
+            --blue: #d7edf7;
+            --pink: #f5d7dc;
+            --yellow: #f6e8b8;
+            --coral: #d96f5d;
         }
 
         .stApp {
             background:
-                linear-gradient(rgba(231, 220, 203, 0.42) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(231, 220, 203, 0.42) 1px, transparent 1px),
-                var(--paper);
-            background-size: 26px 26px;
+                linear-gradient(90deg, transparent 0 72px, rgba(240, 179, 170, 0.45) 72px 73px, transparent 73px),
+                repeating-linear-gradient(0deg, var(--paper) 0 31px, rgba(201, 223, 240, 0.68) 31px 32px);
             color: var(--ink);
         }
 
         .block-container {
-            max-width: 1040px;
-            padding-top: 2.25rem;
+            max-width: 980px;
+            padding-top: 2rem;
             padding-bottom: 4rem;
         }
 
@@ -45,41 +44,26 @@ st.markdown(
             letter-spacing: 0;
         }
 
-        .top-strip {
-            height: 10px;
-            border: 1px solid var(--ink);
-            background: repeating-linear-gradient(
-                90deg,
-                var(--mint) 0 22px,
-                var(--blue) 22px 44px,
-                var(--yellow) 44px 66px,
-                var(--pink) 66px 88px
-            );
-            margin-bottom: 18px;
-        }
-
         .hero {
-            border: 1px solid var(--ink);
-            background: rgba(255, 250, 241, 0.86);
-            padding: 30px 34px 24px;
-            box-shadow: 6px 6px 0 #272321;
+            background: rgba(255, 253, 247, 0.72);
+            padding: 18px 0 8px;
         }
 
         .eyebrow {
             display: inline-block;
-            border: 1px solid var(--ink);
-            background: var(--blue);
-            padding: 5px 10px;
+            border-bottom: 2px solid var(--margin);
+            color: var(--muted);
+            padding: 0 0 4px;
             font-size: 0.76rem;
             text-transform: uppercase;
             font-weight: 700;
-            margin-bottom: 18px;
+            margin-bottom: 14px;
         }
 
         .hero h1 {
-            font-size: clamp(2.35rem, 6vw, 5.3rem);
-            line-height: 0.92;
-            margin: 0 0 18px;
+            font-size: clamp(2.2rem, 5vw, 4rem);
+            line-height: 1;
+            margin: 0 0 14px;
             color: var(--ink);
             max-width: 760px;
         }
@@ -92,30 +76,33 @@ st.markdown(
             margin: 0;
         }
 
-        .workbench {
-            border: 1px solid var(--ink);
-            background: rgba(255, 255, 255, 0.72);
-            padding: 22px;
-            margin-top: 22px;
+        .workbench-title {
+            margin-top: 1.4rem;
+            margin-bottom: 0.2rem;
+            font-size: 0.92rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--muted);
         }
 
         .guide-grid {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 14px;
-            margin: 22px 0;
+            gap: 16px;
+            margin: 20px 0 24px;
         }
 
         .guide-card {
-            border: 1px solid var(--ink);
+            border: 1px solid rgba(39, 35, 33, 0.28);
             background: #fffdf8;
             padding: 16px;
             min-height: 124px;
+            box-shadow: 0 8px 18px rgba(39, 35, 33, 0.08);
         }
 
-        .guide-card:nth-child(1) { background: var(--blue); }
-        .guide-card:nth-child(2) { background: var(--pink); }
-        .guide-card:nth-child(3) { background: var(--mint); }
+        .guide-card:nth-child(1) { background: var(--blue); transform: rotate(-0.7deg); }
+        .guide-card:nth-child(2) { background: var(--yellow); transform: rotate(0.6deg); }
+        .guide-card:nth-child(3) { background: var(--mint); transform: rotate(-0.35deg); }
 
         .guide-card strong {
             display: block;
@@ -137,18 +124,11 @@ st.markdown(
             padding: 14px 16px;
             color: var(--muted);
             line-height: 1.5;
-            margin: 16px 0 4px;
-        }
-
-        .result-wrap {
-            border: 1px solid var(--ink);
-            background: #fffdf8;
-            padding: 24px;
-            margin-top: 24px;
+            margin: 16px 0 10px;
         }
 
         .stButton > button {
-            border: 1px solid var(--ink);
+            border: 1px solid rgba(39, 35, 33, 0.32);
             background: var(--coral);
             color: white;
             border-radius: 999px;
@@ -157,21 +137,20 @@ st.markdown(
         }
 
         .stButton > button:hover {
-            border: 1px solid var(--ink);
+            border: 1px solid rgba(39, 35, 33, 0.32);
             background: #d85f49;
             color: white;
         }
 
         [data-testid="stFileUploader"] {
             background: #fffdf8;
-            border: 1px dashed var(--ink);
+            border: 1px dashed rgba(39, 35, 33, 0.36);
             padding: 14px;
         }
 
         @media (max-width: 760px) {
             .hero {
-                padding: 24px 20px;
-                box-shadow: 4px 4px 0 #272321;
+                padding: 18px 0 8px;
             }
 
             .guide-grid {
@@ -183,13 +162,11 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.markdown('<div class="top-strip"></div>', unsafe_allow_html=True)
-
 st.markdown(
     """
     <section class="hero">
         <span class="eyebrow">apoio de leitura</span>
-        <h1>Leitura Cient&iacute;fica Guiada</h1>
+        <h1>Insight Cient&iacute;fico</h1>
         <p>
             Use esta p&aacute;gina para ler um artigo com mais clareza. Ela prepara uma explica&ccedil;&atilde;o
             em portugu&ecirc;s brasileiro, mantendo as cautelas do estudo e separando o que foi observado
@@ -220,10 +197,9 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.markdown('<div class="workbench">', unsafe_allow_html=True)
-st.subheader("Selecionar artigo")
+st.markdown('<h2 class="workbench-title">Selecionar artigo</h2>', unsafe_allow_html=True)
 st.write(
-    "Carregue um PDF com texto selecionavel. Arquivos scaneados como imagem podem nao ser lidos corretamente."
+    "Carregue um PDF com texto selecionável. Arquivos scaneados como imagem podem não ser lidos corretamente."
 )
 
 uploaded_file = st.file_uploader(
@@ -235,8 +211,8 @@ uploaded_file = st.file_uploader(
 st.markdown(
     """
     <div class="note">
-        O resultado serve como guia inicial de leitura. Para decisoes importantes, confira o artigo original
-        e observe especialmente metodo, amostra, resultados e limitacoes.
+        O resultado serve como guia inicial de leitura. Para decisões importantes, confira o artigo original
+        e observe especialmente método, amostra, resultados e limitações.
     </div>
     """,
     unsafe_allow_html=True,
@@ -245,7 +221,7 @@ st.markdown(
 if uploaded_file is not None:
     st.write(f"Arquivo selecionado: {uploaded_file.name}")
 
-    if st.button("Gerar leitura guiada", type="primary"):
+    if st.button("Gerar insight científico", type="primary"):
         suffix = Path(uploaded_file.name).suffix or ".pdf"
 
         with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as temp_file:
@@ -258,9 +234,5 @@ if uploaded_file is not None:
         finally:
             Path(temp_path).unlink(missing_ok=True)
 
-        st.markdown('<div class="result-wrap">', unsafe_allow_html=True)
-        st.markdown("### Leitura guiada")
+        st.markdown("### Insight cientifico")
         st.markdown(result)
-        st.markdown("</div>", unsafe_allow_html=True)
-
-st.markdown("</div>", unsafe_allow_html=True)
